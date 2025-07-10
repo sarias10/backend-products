@@ -2,9 +2,12 @@ package com.sergio.curso.springboot.backend.backend_products.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.sergio.curso.springboot.backend.backend_products.entities.Product;
 
+// con esta anotación, se permiten solicitudes de esta ruta a la api
+@CrossOrigin(origins = "http://localhost:5173/")
 // implementa un patron especial HateOas asi que la respuesta json tiene varios atributos que no nos importan
 // ayuda a crear endpoints rapidos sin mucha logica detras
 // es un rest controller CRUD pero implementado de forma automatica
