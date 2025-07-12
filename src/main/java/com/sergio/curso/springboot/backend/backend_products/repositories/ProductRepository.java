@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import com.sergio.curso.springboot.backend.backend_products.entities.Product;
 
 // con esta anotación, se permiten solicitudes de esta ruta a la api
-@CrossOrigin(origins = "http://localhost:5173/")
+// el puerto 5173 es el de React
+// el puerto 4200 es el de Angular
+@CrossOrigin(origins = {"http://localhost:5173/", "http://localhost:4200/"})
 // implementa un patron especial HateOas asi que la respuesta json tiene varios atributos que no nos importan
 // ayuda a crear endpoints rapidos sin mucha logica detras
 // es un rest controller CRUD pero implementado de forma automatica
