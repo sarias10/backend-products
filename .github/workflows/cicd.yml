@@ -19,7 +19,11 @@ jobs:
                 distribution: 'temurin'
             
             - name: Build JAR with Maven
-              run: mvn clean package
+              run: |
+                DB_URL=jdbc:postgresql://fake:5432/fake \
+                DB_USERNAME=fake \
+                DB_PASSWORD=fake \
+                mvn clean package
 
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v2

@@ -2,6 +2,8 @@ para empquetar la aplicación en un jar
 
 ./mvnw clean package
 
+para poder usar el comando anterior, las variables (DB_URL, DB_USERNAME y DB_PASSWORD) ya deben estar exportadas
+
 asi se ejecuta la imagen
 
 java -jar target/backend-products-0.0.1-SNAPSHOT.jar
