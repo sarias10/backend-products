@@ -21,7 +21,7 @@ jobs:
             
             - name: Login to Amazon ECR
               run: |
-                aws ecr get-login-password -region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password stdin 390844762416.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com
+                aws ecr get-login-password --region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com
             
             - name: Delete ECR image tagged with latest (if exists)
               run: |
@@ -31,11 +31,11 @@ jobs:
             - name: Build Docker Image
               run: |
                 docker build -t ${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }} .
-                docker tag ${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }} 390844762416.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }}
+                docker tag ${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }} ${{ vars.AWS_ACCOUNT_ID }}.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }}
             
             - name: Push Docker Image to ECR
               run: |
-                docker push 390844762416.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }}
+                docker push ${{ vars.AWS_ACCOUNT_ID }}.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }}
     
     deploy:
         needs: build
@@ -74,7 +74,7 @@ jobs:
                 key: ${{ secrets.EC2_SSH_KEY }}
                 script: |
                     echo "Logging into ECR..."
-                        aws ecr get-login-password --region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin 390844762416.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com
+                        aws ecr get-login-password --region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com
                         
                         echo ${{ vars.ENV_FILE }} > .env.production
 
@@ -85,17 +85,17 @@ jobs:
                         docker rm ${{ vars.DOCKER_CONTAINER_NAME }} || true
 
                         echo "Deleting old image..."
-                        docker rmi 390844762416.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }} || true
+                        docker rmi ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }} || true
 
                         echo "Pulling new image..."
-                        docker pull 390844762416.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }}
+                        docker pull ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }}
 
                         echo "Running new container..."
                         docker run -d -p \
                         8081:8081 \
                         --name ${{ vars.DOCKER_CONTAINER_NAME }} \
                         --env-file .env.production \
-                        390844762416.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }}
+                        ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/${{ vars.ECR_REPOSITORY }}:${{ vars.IMAGE_TAG }}
                         
                         echo "Cleaning up .env.production"
                         rm .env.production
